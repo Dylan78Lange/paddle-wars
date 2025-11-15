@@ -79,6 +79,12 @@ const MAX_SPEED = 12;
 const POWER_UP_DURATION = 20000; // 20 seconds
 const POWER_UP_SPAWN_CHANCE = 0.3; // 30% chance after rally
 
+// Nudge system
+let player1NudgesLeft = 1;
+let player2NudgesLeft = 1;
+const NUDGES_PER_RALLY = 1; // One nudge per rally
+const NUDGE_SPEED_BOOST = 1.5;
+
 // Menu handlers
 document.getElementById('singlePlayer').addEventListener('click', () => {
     gameMode = 'single';
@@ -167,10 +173,12 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
     }
     
-    // Player 1 release ball (E)
+    // Player 1 action button (E) - release ball or nudge
     if (e.key === 'e' || e.key === 'E') {
         if (ballStuckToPlayer === 1) {
             releaseBall(1);
+        } else {
+            nudgeBall(1);
         }
         e.preventDefault();
     }
@@ -186,10 +194,12 @@ document.addEventListener('keydown', (e) => {
             e.preventDefault();
         }
         
-        // Player 2 release ball (O)
+        // Player 2 action button (O) - release ball or nudge
         if (e.key === 'o' || e.key === 'O') {
             if (ballStuckToPlayer === 2) {
                 releaseBall(2);
+            } else {
+                nudgeBall(2);
             }
             e.preventDefault();
         }
@@ -287,6 +297,10 @@ function resetBall() {
     
     ball.speedX = direction * ball.speed * Math.cos(angle);
     ball.speedY = ball.speed * Math.sin(angle);
+    
+    // Reset nudges for new rally
+    player1NudgesLeft = NUDGES_PER_RALLY;
+    player2NudgesLeft = NUDGES_PER_RALLY;
 }
 
 function spawnPowerUp() {
@@ -502,6 +516,39 @@ function releaseBall(playerNum) {
     }
 }
 
+function nudgeBall(playerNum) {
+    // Check if player has nudges left
+    if (playerNum === 1 && player1NudgesLeft <= 0) return;
+    if (playerNum === 2 && player2NudgesLeft <= 0) return;
+    
+    // Only nudge if ball is moving and not stuck
+    if (ballStuckToPlayer !== null) return;
+    
+    // Check if ball is near the player's side
+    const isNearPlayer1 = ball.x < canvas.width / 2 && playerNum === 1;
+    const isNearPlayer2 = ball.x > canvas.width / 2 && playerNum === 2;
+    
+    if (!isNearPlayer1 && !isNearPlayer2) return;
+    
+    // Apply nudge: random vertical direction + speed boost
+    const nudgeDirection = Math.random() < 0.5 ? 1 : -1;
+    ball.speedY += nudgeDirection * 2; // Add vertical velocity
+    
+    // Slight speed boost
+    const currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
+    const newSpeed = Math.min(currentSpeed * NUDGE_SPEED_BOOST, MAX_SPEED);
+    const ratio = newSpeed / currentSpeed;
+    ball.speedX *= ratio;
+    ball.speedY *= ratio;
+    
+    // Consume nudge
+    if (playerNum === 1) {
+        player1NudgesLeft--;
+    } else {
+        player2NudgesLeft--;
+    }
+}
+
 function moveBall() {
     // Don't move ball if it's stuck to a paddle
     if (ballStuckToPlayer !== null) {
@@ -512,12 +559,23 @@ function moveBall() {
     ball.y += ball.speedY;
     
     // Top and bottom wall collision
-    if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
-        ball.speedY = -ball.speedY;
+    if (ball.y - ball.radius < 0) {
+        // Hit top wall
+        ball.y = ball.radius; // Move ball away from wall
+        ball.speedY = Math.abs(ball.speedY); // Force downward
         
-        // Ensure ball never gets stuck in purely horizontal trajectory
-        if (Math.abs(ball.speedY) < 0.5) {
-            ball.speedY = ball.speedY >= 0 ? 1 : -1;
+        // Ensure minimum vertical velocity
+        if (ball.speedY < 1) {
+            ball.speedY = 1;
+        }
+    } else if (ball.y + ball.radius > canvas.height) {
+        // Hit bottom wall
+        ball.y = canvas.height - ball.radius; // Move ball away from wall
+        ball.speedY = -Math.abs(ball.speedY); // Force upward
+        
+        // Ensure minimum vertical velocity
+        if (Math.abs(ball.speedY) < 1) {
+            ball.speedY = -1;
         }
     }
     
@@ -538,12 +596,15 @@ function moveBall() {
             ball.speedY = 0;
         } else {
             ball.speedX = -ball.speedX;
-            const hitPos = (ball.y - (player1.y + player1.height / 2)) / (player1.height / 2);
+            // Calculate hit position (-1 to 1, where 0 is center)
+            let hitPos = (ball.y - (player1.y + player1.height / 2)) / (player1.height / 2);
+            // Clamp to prevent extreme angles
+            hitPos = Math.max(-0.8, Math.min(0.8, hitPos));
             ball.speedY = hitPos * ball.speed;
             
             // Ensure minimum vertical velocity to prevent horizontal lock
-            if (Math.abs(ball.speedY) < 0.5) {
-                ball.speedY = hitPos >= 0 ? 0.5 : -0.5;
+            if (Math.abs(ball.speedY) < 1.5) {
+                ball.speedY = hitPos >= 0 ? 1.5 : -1.5;
             }
         }
         
@@ -578,12 +639,15 @@ function moveBall() {
             ball.speedY = 0;
         } else {
             ball.speedX = -ball.speedX;
-            const hitPos = (ball.y - (player2.y + player2.height / 2)) / (player2.height / 2);
+            // Calculate hit position (-1 to 1, where 0 is center)
+            let hitPos = (ball.y - (player2.y + player2.height / 2)) / (player2.height / 2);
+            // Clamp to prevent extreme angles
+            hitPos = Math.max(-0.8, Math.min(0.8, hitPos));
             ball.speedY = hitPos * ball.speed;
             
             // Ensure minimum vertical velocity to prevent horizontal lock
-            if (Math.abs(ball.speedY) < 0.5) {
-                ball.speedY = hitPos >= 0 ? 0.5 : -0.5;
+            if (Math.abs(ball.speedY) < 1.5) {
+                ball.speedY = hitPos >= 0 ? 1.5 : -1.5;
             }
         }
         
@@ -923,6 +987,8 @@ function setupTouchControls() {
             e.preventDefault();
             if (ballStuckToPlayer === 1) {
                 releaseBall(1);
+            } else {
+                nudgeBall(1);
             }
         });
         
@@ -953,6 +1019,8 @@ function setupTouchControls() {
             e.preventDefault();
             if (ballStuckToPlayer === 2 && gameMode === 'two') {
                 releaseBall(2);
+            } else if (gameMode === 'two') {
+                nudgeBall(2);
             }
         });
     }
