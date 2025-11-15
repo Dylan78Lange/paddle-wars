@@ -472,6 +472,16 @@ function movePaddles() {
     // If ball is stuck to player 2, move it with paddle
     if (ballStuckToPlayer === 2) {
         ball.y = player2.y + player2.height / 2;
+        
+        // AI auto-release after a short delay (in single player mode)
+        if (gameMode === 'single') {
+            // Release ball after 0.5 seconds
+            setTimeout(() => {
+                if (ballStuckToPlayer === 2) {
+                    releaseBall(2);
+                }
+            }, 500);
+        }
     }
 }
 
@@ -480,12 +490,15 @@ function releaseBall(playerNum) {
     
     ballStuckToPlayer = null;
     
+    // Add slight random angle to prevent purely horizontal trajectory
+    const randomAngle = (Math.random() - 0.5) * 0.3; // Small random angle
+    
     if (playerNum === 1) {
-        ball.speedX = ball.speed;
-        ball.speedY = 0;
+        ball.speedX = ball.speed * Math.cos(randomAngle);
+        ball.speedY = ball.speed * Math.sin(randomAngle);
     } else {
-        ball.speedX = -ball.speed;
-        ball.speedY = 0;
+        ball.speedX = -ball.speed * Math.cos(randomAngle);
+        ball.speedY = ball.speed * Math.sin(randomAngle);
     }
 }
 
@@ -501,6 +514,11 @@ function moveBall() {
     // Top and bottom wall collision
     if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
         ball.speedY = -ball.speedY;
+        
+        // Ensure ball never gets stuck in purely horizontal trajectory
+        if (Math.abs(ball.speedY) < 0.5) {
+            ball.speedY = ball.speedY >= 0 ? 1 : -1;
+        }
     }
     
     // Paddle collision
@@ -522,6 +540,11 @@ function moveBall() {
             ball.speedX = -ball.speedX;
             const hitPos = (ball.y - (player1.y + player1.height / 2)) / (player1.height / 2);
             ball.speedY = hitPos * ball.speed;
+            
+            // Ensure minimum vertical velocity to prevent horizontal lock
+            if (Math.abs(ball.speedY) < 0.5) {
+                ball.speedY = hitPos >= 0 ? 0.5 : -0.5;
+            }
         }
         
         // Increase rally count and speed
@@ -557,6 +580,11 @@ function moveBall() {
             ball.speedX = -ball.speedX;
             const hitPos = (ball.y - (player2.y + player2.height / 2)) / (player2.height / 2);
             ball.speedY = hitPos * ball.speed;
+            
+            // Ensure minimum vertical velocity to prevent horizontal lock
+            if (Math.abs(ball.speedY) < 0.5) {
+                ball.speedY = hitPos >= 0 ? 0.5 : -0.5;
+            }
         }
         
         // Increase rally count and speed
