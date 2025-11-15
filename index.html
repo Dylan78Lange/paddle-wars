@@ -43,6 +43,19 @@
                 <p id="player2Controls"><strong>Player 2:</strong> P (up) / L (down) / O (release ball)</p>
             </div>
             
+            <div class="touch-controls" id="touchControls">
+                <div class="touch-control-side">
+                    <button class="touch-btn" id="p1Up">↑</button>
+                    <button class="touch-btn" id="p1Down">↓</button>
+                    <button class="touch-btn" id="p1Release">⚡</button>
+                </div>
+                <div class="touch-control-side" id="p2TouchControls">
+                    <button class="touch-btn" id="p2Up">↑</button>
+                    <button class="touch-btn" id="p2Down">↓</button>
+                    <button class="touch-btn" id="p2Release">⚡</button>
+                </div>
+            </div>
+            
             <button id="backToMenu">Back to Menu</button>
         </div>
 
@@ -50,6 +63,22 @@
             <h2 id="winnerText"></h2>
             <button id="playAgain">Play Again</button>
             <button id="mainMenu">Main Menu</button>
+        </div>
+
+        <div class="about-section">
+            <button id="aboutBtn" class="about-toggle">ℹ️ About</button>
+            <div id="aboutContent" class="about-content" style="display: none;">
+                <h3>About This Game</h3>
+                <p>This game was created as a fun project to show my daughter how quickly and easily it's possible to build a game with modern AI tools.</p>
+                <p><strong>Built with Kiro:</strong> An AI-powered coding assistant that helps developers write, debug, and deploy code faster. Kiro understands your codebase and provides intelligent suggestions, making development more efficient and enjoyable.</p>
+                <p>From concept to deployment in under an hour! 🚀</p>
+                <a href="https://github.com/Dylan78Lange/paddle-wars/issues/new" target="_blank" rel="noopener noreferrer">
+                    <button class="feedback-btn">💬 Provide Feedback</button>
+                </a>
+                <a href="https://github.com/Dylan78Lange/paddle-wars" target="_blank" rel="noopener noreferrer" class="github-link">
+                    View on GitHub →
+                </a>
+            </div>
         </div>
     </div>
 

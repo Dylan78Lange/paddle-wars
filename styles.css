@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -12,46 +13,51 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 10px;
+    overflow-x: hidden;
 }
 
 .container {
     text-align: center;
+    width: 100%;
+    max-width: 900px;
 }
 
 h1 {
-    font-size: 4rem;
-    margin-bottom: 30px;
+    font-size: clamp(2rem, 8vw, 4rem);
+    margin-bottom: 20px;
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    letter-spacing: 10px;
+    letter-spacing: clamp(2px, 2vw, 10px);
 }
 
-.menu {
+.menu, .difficulty-menu {
     background: rgba(255, 255, 255, 0.1);
-    padding: 40px;
+    padding: clamp(20px, 5vw, 40px);
     border-radius: 15px;
     backdrop-filter: blur(10px);
 }
 
-.menu h2 {
-    margin-bottom: 30px;
-    font-size: 2rem;
+.menu h2, .difficulty-menu h2 {
+    margin-bottom: 20px;
+    font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
 button {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     border: 2px solid white;
-    padding: 15px 30px;
-    font-size: 1.2rem;
+    padding: 12px 24px;
+    font-size: clamp(1rem, 3vw, 1.2rem);
     font-family: 'Courier New', monospace;
     cursor: pointer;
-    margin: 10px;
+    margin: 8px;
     border-radius: 8px;
     transition: all 0.3s;
+    touch-action: manipulation;
+    min-width: 120px;
 }
 
-button:hover {
+button:hover, button:active {
     background: white;
     color: #1e3c72;
     transform: scale(1.05);
@@ -59,7 +65,7 @@ button:hover {
 
 .game-container {
     background: rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    padding: clamp(10px, 3vw, 20px);
     border-radius: 15px;
     backdrop-filter: blur(10px);
 }
@@ -67,14 +73,14 @@ button:hover {
 .scoreboard {
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
-    font-size: 2rem;
+    margin-bottom: 15px;
+    font-size: clamp(1.5rem, 5vw, 2rem);
 }
 
 .score {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 #pongCanvas {
@@ -83,29 +89,167 @@ button:hover {
     border-radius: 5px;
     display: block;
     margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
 }
 
 .controls {
-    margin-top: 20px;
-    font-size: 1rem;
+    margin-top: 15px;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
 }
 
 .controls p {
     margin: 5px 0;
 }
 
+.touch-controls {
+    display: none;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 0 10px;
+}
+
+.touch-control-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+}
+
+.touch-btn {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid white;
+    color: white;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    padding: 15px;
+    border-radius: 10px;
+    touch-action: manipulation;
+    user-select: none;
+    font-weight: bold;
+}
+
+.touch-btn:active {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+    .touch-controls {
+        display: flex;
+    }
+    
+    .controls {
+        display: none;
+    }
+}
+
 .game-over {
     background: rgba(255, 255, 255, 0.1);
-    padding: 40px;
+    padding: clamp(20px, 5vw, 40px);
     border-radius: 15px;
     backdrop-filter: blur(10px);
 }
 
 .game-over h2 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
+    font-size: clamp(1.8rem, 6vw, 2.5rem);
+    margin-bottom: 20px;
 }
 
 #backToMenu {
-    margin-top: 20px;
+    margin-top: 15px;
+}
+
+.about-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.about-toggle {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    margin-bottom: 15px;
+}
+
+.about-content {
+    background: rgba(255, 255, 255, 0.1);
+    padding: clamp(20px, 4vw, 30px);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.about-content h3 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.about-content p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.feedback-btn {
+    background: rgba(76, 175, 80, 0.3);
+    border: 2px solid #4CAF50;
+    width: 100%;
+    margin: 15px 0 10px 0;
+}
+
+.feedback-btn:hover, .feedback-btn:active {
+    background: #4CAF50;
+    color: white;
+}
+
+.github-link {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    margin-top: 10px;
+    text-align: center;
+    transition: color 0.3s;
+}
+
+.github-link:hover {
+    color: white;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        min-width: 100px;
+    }
+    
+    .about-section {
+        margin-top: 20px;
+    }
+    
+    .about-content {
+        text-align: left;
+    }
 }

@@ -7,6 +7,11 @@ let gameDifficulty = 'medium'; // 'easy', 'medium', 'hard'
 let gameRunning = false;
 let animationId = null;
 
+// Responsive canvas
+let canvasScale = 1;
+const BASE_WIDTH = 800;
+const BASE_HEIGHT = 600;
+
 // Game objects
 const ball = {
     x: 400,
@@ -83,6 +88,20 @@ document.getElementById('singlePlayer').addEventListener('click', () => {
 document.getElementById('twoPlayer').addEventListener('click', () => {
     gameMode = 'two';
     startGame();
+});
+
+// About section toggle
+document.getElementById('aboutBtn').addEventListener('click', () => {
+    const aboutContent = document.getElementById('aboutContent');
+    const aboutBtn = document.getElementById('aboutBtn');
+    
+    if (aboutContent.style.display === 'none') {
+        aboutContent.style.display = 'block';
+        aboutBtn.textContent = '✕ Close';
+    } else {
+        aboutContent.style.display = 'none';
+        aboutBtn.textContent = 'ℹ️ About';
+    }
 });
 
 document.getElementById('easyMode').addEventListener('click', () => {
@@ -186,11 +205,14 @@ function startGame() {
     if (gameMode === 'single') {
         document.getElementById('player2Name').textContent = 'Computer';
         document.getElementById('player2Controls').style.display = 'none';
+        document.getElementById('p2TouchControls').style.display = 'none';
     } else {
         document.getElementById('player2Name').textContent = 'Player 2';
         document.getElementById('player2Controls').style.display = 'block';
+        document.getElementById('p2TouchControls').style.display = 'flex';
     }
     
+    resizeCanvas();
     gameRunning = true;
     gameLoop();
 }
@@ -816,7 +838,94 @@ function gameLoop() {
     animationId = requestAnimationFrame(gameLoop);
 }
 
+// Resize canvas for mobile
+function resizeCanvas() {
+    const container = document.querySelector('.game-container');
+    const maxWidth = Math.min(BASE_WIDTH, window.innerWidth - 40);
+    const maxHeight = window.innerHeight - 300;
+    
+    canvasScale = Math.min(maxWidth / BASE_WIDTH, maxHeight / BASE_HEIGHT, 1);
+    
+    canvas.style.width = (BASE_WIDTH * canvasScale) + 'px';
+    canvas.style.height = (BASE_HEIGHT * canvasScale) + 'px';
+}
+
+// Touch controls
+function setupTouchControls() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    if (isMobile) {
+        // Player 1 controls
+        const p1Up = document.getElementById('p1Up');
+        const p1Down = document.getElementById('p1Down');
+        const p1Release = document.getElementById('p1Release');
+        
+        p1Up.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            player1.upPressed = true;
+        });
+        p1Up.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            player1.upPressed = false;
+        });
+        
+        p1Down.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            player1.downPressed = true;
+        });
+        p1Down.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            player1.downPressed = false;
+        });
+        
+        p1Release.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (ballStuckToPlayer === 1) {
+                releaseBall(1);
+            }
+        });
+        
+        // Player 2 controls (only for two-player mode)
+        const p2Up = document.getElementById('p2Up');
+        const p2Down = document.getElementById('p2Down');
+        const p2Release = document.getElementById('p2Release');
+        
+        p2Up.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameMode === 'two') player2.upPressed = true;
+        });
+        p2Up.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            player2.upPressed = false;
+        });
+        
+        p2Down.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (gameMode === 'two') player2.downPressed = true;
+        });
+        p2Down.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            player2.downPressed = false;
+        });
+        
+        p2Release.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (ballStuckToPlayer === 2 && gameMode === 'two') {
+                releaseBall(2);
+            }
+        });
+    }
+}
+
 // Initialize when DOM is loaded
 canvas = document.getElementById('pongCanvas');
 ctx = canvas.getContext('2d');
+
+window.addEventListener('resize', () => {
+    if (gameRunning) {
+        resizeCanvas();
+    }
+});
+
+setupTouchControls();
 showMenu();
