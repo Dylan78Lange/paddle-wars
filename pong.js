@@ -104,6 +104,19 @@ document.getElementById('aboutBtn').addEventListener('click', () => {
     }
 });
 
+// Control layout toggle
+let controlLayoutHorizontal = false;
+document.getElementById('toggleLayout').addEventListener('click', () => {
+    const touchControls = document.getElementById('touchControls');
+    controlLayoutHorizontal = !controlLayoutHorizontal;
+    
+    if (controlLayoutHorizontal) {
+        touchControls.classList.add('horizontal');
+    } else {
+        touchControls.classList.remove('horizontal');
+    }
+});
+
 document.getElementById('easyMode').addEventListener('click', () => {
     gameDifficulty = 'easy';
     startGame();
