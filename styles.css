@@ -126,6 +126,38 @@ button:hover, button:active {
     flex: 1;
 }
 
+/* Reorder buttons for vertical layout: Up, Down, Release */
+.touch-control-side #p1Up,
+.touch-control-side #p2Up {
+    order: 1;
+}
+
+.touch-control-side #p1Down,
+.touch-control-side #p2Down {
+    order: 2;
+}
+
+.touch-control-side #p1Release,
+.touch-control-side #p2Release {
+    order: 3;
+}
+
+/* Reorder buttons for horizontal layout: Up, Release, Down */
+.touch-controls.horizontal .touch-control-side #p1Up,
+.touch-controls.horizontal .touch-control-side #p2Up {
+    order: 1;
+}
+
+.touch-controls.horizontal .touch-control-side #p1Release,
+.touch-controls.horizontal .touch-control-side #p2Release {
+    order: 2;
+}
+
+.touch-controls.horizontal .touch-control-side #p1Down,
+.touch-controls.horizontal .touch-control-side #p2Down {
+    order: 3;
+}
+
 .layout-toggle {
     display: none;
     background: rgba(255, 255, 255, 0.15);
