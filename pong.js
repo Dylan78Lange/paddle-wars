@@ -957,7 +957,10 @@ function resizeCanvas() {
 
 // Touch controls
 function setupTouchControls() {
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    // Detect mobile devices including iPads (which may report as Mac)
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+        || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2) // Detects touch-capable devices like iPad
+        || window.innerWidth < 768;
     
     if (isMobile) {
         // Player 1 controls
